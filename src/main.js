@@ -64,7 +64,7 @@ function applySceneFlagWrites(scene) {
   }
 }
 
-// PHASE 1.1 + 1.2: Parse {if flagKey operator value} conditional lines in scene text
+// PHASE 1.1 + 1.2: Parse {if flagKey operator value} conditional lines
 function resolveText(text, flags) {
   return text
     .split("<br>")
@@ -114,6 +114,74 @@ function getCurrentScene() {
   return chapter.scenes.find(s => s.sceneRef === resolved);
 }
 
+<<<<<<< HEAD
+// Google Translate-safe DOM write
+function setHTML(id, html) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const fresh = el.cloneNode(false);
+  fresh.innerHTML = html;
+  el.parentNode.replaceChild(fresh, el);
+}
+
+// 2.3: Apply background colour from backgroundKey
+function applyBackground(backgroundKey) {
+  const cls = BG_MAP[backgroundKey] || BG_MAP['default'];
+  BG_CLASSES.forEach(c => document.body.classList.remove(c));
+  document.body.classList.add(cls);
+}
+
+// 2.2: Show chapter title card, then call done() when dismissed
+function showChapterCard(chapter, done) {
+  const card = document.getElementById('chapter-card');
+  document.getElementById('chapter-card-number').textContent =
+    'Chapter ' + chapter.number;
+  document.getElementById('chapter-card-title').textContent =
+    chapter.title || '';
+  document.getElementById('chapter-card-subtitle').textContent =
+    chapter.subtitle || '';
+
+  card.classList.remove('hidden', 'fading-out');
+
+  // Auto-dismiss after 2.5s with fade
+  setTimeout(() => {
+    card.classList.add('fading-out');
+    setTimeout(() => {
+      card.classList.add('hidden');
+      card.classList.remove('fading-out');
+      done();
+    }, 600);
+  }, 2500);
+}
+
+// 2.5: Update flag bar widths (max value per flag capped at 8 for display)
+const FLAG_MAX = 8;
+const FLAG_BAR_KEYS = [
+  'ruthlessness', 'political_power', 'mitsuhide_loyalty',
+  'bond_strength', 'weapon_legacy', 'road_command'
+];
+
+function renderFlagBar() {
+  FLAG_BAR_KEYS.forEach(key => {
+    const el = document.getElementById('flag-' + key);
+    if (!el) return;
+    const val = Math.max(0, state.flags[key] ?? 0);
+    el.style.width = Math.min(100, (val / FLAG_MAX) * 100) + '%';
+  });
+}
+
+// 2.1: Fade out story content, swap, fade in
+function renderWithFade(fn) {
+  const content = document.getElementById('story-content');
+  content.classList.add('fading');
+  setTimeout(() => {
+    fn();
+    content.classList.remove('fading');
+  }, 200);
+}
+
+=======
+>>>>>>> 6e9e8192371e126d1a10c04750a31e889812a280
 function render() {
   const chapter = getCurrentChapter();
   const scene = getCurrentScene();
@@ -124,11 +192,17 @@ function render() {
     return;
   }
 
-  // Apply scene-level flags on entry, BEFORE saving
   applySceneFlagWrites(scene);
   saveState();
 
+<<<<<<< HEAD
+  // 2.3: Apply background
+  if (scene.backgroundKey) applyBackground(scene.backgroundKey);
+
+  setHTML('chapter-title-text',
+=======
   document.getElementById('chapter-title').textContent =
+>>>>>>> 6e9e8192371e126d1a10c04750a31e889812a280
     (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
     (chapter.subtitle ? " — " + chapter.subtitle : '');
 
@@ -136,29 +210,34 @@ function render() {
   document.getElementById('scene').innerHTML =
     `<p>${resolveText(scene.text, state.flags)}</p>`;
 
+<<<<<<< HEAD
+  setHTML('choices', '');
+=======
+>>>>>>> 6e9e8192371e126d1a10c04750a31e889812a280
   const choicesDiv = document.getElementById('choices');
   choicesDiv.innerHTML = '';
 
-  // Battle gate handler (MVP)
+  // Battle gate handler
   if (scene.isBattleGate) {
     const winBtn = document.createElement('button');
     winBtn.textContent = "⚔️ Fight";
     winBtn.onclick = () => {
       setFlag('battle_won', 1);           // PHASE 1.3
       state.sceneRef = scene.battleWinSceneRef;
-      render();
-      renderFlags();
+      renderWithFade(render);
+      renderFlagBar();
     };
     const loseBtn = document.createElement('button');
     loseBtn.textContent = "🏳️ Retreat";
     loseBtn.onclick = () => {
       setFlag('battle_lost', 1);          // PHASE 1.3
       state.sceneRef = scene.battleLoseSceneRef;
-      render();
-      renderFlags();
+      renderWithFade(render);
+      renderFlagBar();
     };
     choicesDiv.appendChild(winBtn);
     choicesDiv.appendChild(loseBtn);
+    renderFlagBar();
     return;
   }
 
@@ -172,37 +251,52 @@ function render() {
 
         if (!choice.nextScene) {
           if (state.chapterIdx < chapters.length - 1) {
-            state.chapterIdx += 1;
-            state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
+            const nextIdx = state.chapterIdx + 1;
+            // 2.2: Show chapter card before advancing
+            showChapterCard(chapters[nextIdx], () => {
+              state.chapterIdx = nextIdx;
+              state.sceneRef = chapters[nextIdx].scenes[0].sceneRef;
+              renderWithFade(render);
+              renderFlagBar();
+            });
           } else {
+<<<<<<< HEAD
+            setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
+            setHTML('choices', '');
+            renderFlagBar();
+=======
             document.getElementById('scene').innerHTML =
               '<p>End of Story. Thanks for playing!</p>';
             choicesDiv.innerHTML = '';
             renderFlags();
             return;
+>>>>>>> 6e9e8192371e126d1a10c04750a31e889812a280
           }
         } else {
           state.sceneRef = choice.nextScene;
+          renderWithFade(render);
+          renderFlagBar();
         }
-        render();
-        renderFlags();
       };
       choicesDiv.appendChild(btn);
     });
   } else {
-    // No choices: go to nextScene if present, otherwise advance chapter
     const btn = document.createElement('button');
     btn.textContent = "Continue";
     btn.onclick = () => {
       if (scene.nextScene) {
         state.sceneRef = scene.nextScene;
-        render();
-        renderFlags();
+        renderWithFade(render);
+        renderFlagBar();
       } else if (state.chapterIdx < chapters.length - 1) {
-        state.chapterIdx += 1;
-        state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
-        render();
-        renderFlags();
+        const nextIdx = state.chapterIdx + 1;
+        // 2.2: Show chapter card before advancing
+        showChapterCard(chapters[nextIdx], () => {
+          state.chapterIdx = nextIdx;
+          state.sceneRef = chapters[nextIdx].scenes[0].sceneRef;
+          renderWithFade(render);
+          renderFlagBar();
+        });
       } else {
         document.getElementById('scene').innerHTML =
           '<p>End of Story. Thanks for playing!</p>';
@@ -211,18 +305,7 @@ function render() {
     };
     choicesDiv.appendChild(btn);
   }
-  renderFlags();
-}
-
-function renderFlags() {
-  const flagDiv = document.getElementById('flags');
-  if (!flagDiv) return;
-  const flags = getAllFlags();
-  flagDiv.innerHTML =
-    "<h4>Flag States</h4>" +
-    flags
-      .map(f => `${f.label || f.flagKey}: ${state.flags[f.flagKey] ?? 0}`)
-      .join('<br>');
+  renderFlagBar();
 }
 
 // --- INIT ---
