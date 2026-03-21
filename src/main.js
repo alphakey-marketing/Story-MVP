@@ -1,98 +1,153 @@
-import { foolOfOwariChapter } from './fool_of_owari.js';
+import { chapters } from './chaptersIndex.js';
+import { buildDefaultFlags, assertFlagKey, getAllFlags } from './flags.js';
 
-const SAVE_KEY = "story-mvp:progress:v1";
+const SAVE_KEY = "story-mvp:progress:v2"; // New save version for new structure!
 
 let state = {
-  sceneRef: foolOfOwariChapter.scenes[0].sceneRef,
-  flags: {},
+  chapterIdx: 0,
+  sceneRef: chapters[0].scenes[0]?.sceneRef,
+  flags: buildDefaultFlags(),
 };
 
 function saveState() {
   window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
 }
+
 function loadState() {
   const s = window.localStorage.getItem(SAVE_KEY);
   if (s) {
     try {
       const parsed = JSON.parse(s);
-      if (parsed.sceneRef) state = parsed;
-    } catch { /* Ignore broken saves */ }
+      if (
+        typeof parsed.chapterIdx === "number" &&
+        typeof parsed.sceneRef === "string" &&
+        typeof parsed.flags === "object"
+      ) {
+        state = parsed;
+      }
+    } catch {
+      /* Ignore broken saves */
+    }
   }
 }
+
 function setFlag(key, value) {
-  if (!key) return;
-  state.flags[key] = (typeof value === "number" ? ((state.flags[key] || 0) + value) : value);
+  try {
+    assertFlagKey(key);
+    state.flags[key] = (typeof value === "number"
+      ? (state.flags[key] || 0) + value
+      : value
+    );
+  } catch {
+    // Ignore if key is not in registry
+  }
 }
 
-function renderScene() {
-  const chapter = foolOfOwariChapter.chapter;
-  const scenes = foolOfOwariChapter.scenes;
-  const scene = scenes.find(s => s.sceneRef === state.sceneRef);
-  if (!scene) {
+function getCurrentChapter() {
+  return chapters[state.chapterIdx];
+}
+
+function getCurrentScene() {
+  const chapter = getCurrentChapter();
+  return chapter.scenes.find(s => s.sceneRef === state.sceneRef);
+}
+
+function render() {
+  const chapter = getCurrentChapter();
+  const scene = getCurrentScene();
+  if (!chapter || !scene) {
     document.getElementById('scene').innerHTML = "<b>Scene not found.</b>";
     document.getElementById('choices').innerHTML = "";
+    document.getElementById('chapter-title').textContent = '';
     return;
   }
-  // Save progress after scene change
   saveState();
 
-  document.getElementById('chapter-title').textContent = chapter.title + (chapter.subtitle ? (" — " + chapter.subtitle) : '');
+  document.getElementById('chapter-title').textContent =
+    (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
+    (chapter.subtitle ? " — " + chapter.subtitle : '');
 
-  // Minimal background/text info (MVP: just show the keys)
-  let bgHtml = '';
-  if (scene.backgroundKey) bgHtml += `<div class="scenebg">Background: ${scene.backgroundKey}</div>`;
-  if (scene.bgmKey) bgHtml += `<div class="scenebg">Music: ${scene.bgmKey}</div>`;
+  // Render scene text
+  document.getElementById('scene').innerHTML = `<p>${scene.text}</p>`;
 
-  // Dialogue
-  let dlgHtml = scene.dialogueLines.map(line => {
-    let speaker = line.speakerName ? `<span class="speaker">${line.speakerName}:</span> ` : '';
-    return `<div class="dialogue">${speaker}${line.text}</div>`;
-  }).join("");
+  // Render choices as buttons
+  const choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
 
-  document.getElementById('scene').innerHTML = bgHtml + dlgHtml;
-
-  // Scene-level side effects: unconditional flagWrites
-  if (scene.flagWrites && Array.isArray(scene.flagWrites)) {
-    scene.flagWrites.forEach(fw => setFlag(fw.flagKey, fw.flagValue));
-    saveState();
-  }
-
-  // Choices
-  const container = document.getElementById('choices');
-  container.innerHTML = '';
   if (Array.isArray(scene.choices) && scene.choices.length > 0) {
-    scene.choices.forEach(choice => {
+    scene.choices.forEach((choice, idx) => {
       const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.textContent = choice.choiceText;
+      btn.textContent = choice.text;
       btn.onclick = () => {
-        if (choice.flagKey && choice.flagValue !== null)
-          setFlag(choice.flagKey, choice.flagValue);
-        if (choice.flagKey2 && choice.flagValue2 !== null)
-          setFlag(choice.flagKey2, choice.flagValue2);
-        state.sceneRef = choice.nextSceneRef;
-        renderScene();
+        // Apply flagDelta if present
+        if (choice.flagDelta) {
+          const { flagKey, delta } = choice.flagDelta;
+          setFlag(flagKey, delta);
+        }
+        // Advance to next scene or chapter
+        if (!choice.nextScene) {
+          // End of chapter; go to next chapter if available
+          if (state.chapterIdx < chapters.length - 1) {
+            state.chapterIdx += 1;
+            state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
+          } else {
+            document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
+            choicesDiv.innerHTML = '';
+            renderFlags();
+            return;
+          }
+        } else {
+          state.sceneRef = choice.nextScene;
+        }
+        render();
+        renderFlags();
       };
-      container.appendChild(btn);
+      choicesDiv.appendChild(btn);
     });
-  } else if (scene.nextSceneRef) {
-    // No choices: auto-advance after delay or button
+  } else {
+    // No choices (end scene): Offer "Continue"/chapter advance or show end
     const btn = document.createElement('button');
-    btn.className = 'choice-btn';
     btn.textContent = "Continue";
     btn.onclick = () => {
-      state.sceneRef = scene.nextSceneRef;
-      renderScene();
+      // End of chapter logic
+      if (state.chapterIdx < chapters.length - 1) {
+        state.chapterIdx += 1;
+        state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
+        render();
+        renderFlags();
+      } else {
+        document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
+        choicesDiv.innerHTML = '';
+      }
     };
-    container.appendChild(btn);
-  } else if (scene.isChapterEnd) {
-    // Chapter finished
-    container.innerHTML = '<div class="dialogue" style="color:#ffb">End of Chapter.</div>';
-    window.localStorage.removeItem(SAVE_KEY);
+    choicesDiv.appendChild(btn);
   }
+  renderFlags();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadState();
-  renderScene();
-});
+function renderFlags() {
+  // (Optional, for debug/testing)
+  const flagDiv = document.getElementById('flags');
+  if (!flagDiv) return;
+  const flags = getAllFlags();
+  flagDiv.innerHTML =
+    "<h4>Flag States</h4>" +
+    flags
+      .map(f => `${f.label || f.flagKey}: ${state.flags[f.flagKey] ?? 0}`)
+      .join('<br>');
+}
+
+// --- INIT ---
+loadState();
+render();
+
+// Optional: Expose reset for debug
+window.resetStoryState = function() {
+  state = {
+    chapterIdx: 0,
+    sceneRef: chapters[0].scenes[0]?.sceneRef,
+    flags: buildDefaultFlags(),
+  };
+  saveState();
+  render();
+};
