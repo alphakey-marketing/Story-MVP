@@ -1,7 +1,7 @@
 import { chapters } from './chaptersIndex.js';
 import { buildDefaultFlags, assertFlagKey, getAllFlags } from './flags.js';
 
-const SAVE_KEY = "story-mvp:progress:v2"; // New save version for new structure!
+const SAVE_KEY = "story-mvp:progress:v2";
 
 let state = {
   chapterIdx: 0,
@@ -43,6 +43,27 @@ function setFlag(key, value) {
   }
 }
 
+// ✅ FIX BUG 2: Walk flagDelta, flagDelta2, flagDelta3... until none found
+function applyChoiceFlags(choice) {
+  let i = 1;
+  let key = "flagDelta";
+  while (choice[key]) {
+    const { flagKey, delta } = choice[key];
+    setFlag(flagKey, delta);
+    i++;
+    key = "flagDelta" + i;
+  }
+}
+
+// ✅ FIX BUG 3: Apply scene-level flagWrites when entering a scene
+function applySceneFlagWrites(scene) {
+  if (Array.isArray(scene.flagWrites)) {
+    scene.flagWrites.forEach(({ flagKey, flagValue }) => {
+      setFlag(flagKey, flagValue);
+    });
+  }
+}
+
 function getCurrentChapter() {
   return chapters[state.chapterIdx];
 }
@@ -61,32 +82,29 @@ function render() {
     document.getElementById('chapter-title').textContent = '';
     return;
   }
+
+  // ✅ FIX BUG 3: Apply scene-level flags on entry, BEFORE saving
+  applySceneFlagWrites(scene);
   saveState();
 
   document.getElementById('chapter-title').textContent =
     (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
     (chapter.subtitle ? " — " + chapter.subtitle : '');
 
-  // Render scene text
   document.getElementById('scene').innerHTML = `<p>${scene.text}</p>`;
 
-  // Render choices as buttons
   const choicesDiv = document.getElementById('choices');
   choicesDiv.innerHTML = '';
 
   if (Array.isArray(scene.choices) && scene.choices.length > 0) {
-    scene.choices.forEach((choice, idx) => {
+    scene.choices.forEach((choice) => {
       const btn = document.createElement('button');
       btn.textContent = choice.text;
       btn.onclick = () => {
-        // Apply flagDelta if present
-        if (choice.flagDelta) {
-          const { flagKey, delta } = choice.flagDelta;
-          setFlag(flagKey, delta);
-        }
-        // Advance to next scene or chapter
+        // ✅ FIX BUG 2: Apply flagDelta + flagDelta2 + any further deltas
+        applyChoiceFlags(choice);
+
         if (!choice.nextScene) {
-          // End of chapter; go to next chapter if available
           if (state.chapterIdx < chapters.length - 1) {
             state.chapterIdx += 1;
             state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
@@ -105,11 +123,10 @@ function render() {
       choicesDiv.appendChild(btn);
     });
   } else {
-    // No choices (end scene): Offer "Continue"/chapter advance or show end
+    // No choices: offer Continue / chapter advance
     const btn = document.createElement('button');
     btn.textContent = "Continue";
     btn.onclick = () => {
-      // End of chapter logic
       if (state.chapterIdx < chapters.length - 1) {
         state.chapterIdx += 1;
         state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
@@ -126,7 +143,7 @@ function render() {
 }
 
 function renderFlags() {
-  // (Optional, for debug/testing)
+  // Optional debug panel — add <div id="flags"></div> to index.html to enable
   const flagDiv = document.getElementById('flags');
   if (!flagDiv) return;
   const flags = getAllFlags();
@@ -141,7 +158,7 @@ function renderFlags() {
 loadState();
 render();
 
-// Optional: Expose reset for debug
+// Expose reset for debug use in browser console
 window.resetStoryState = function() {
   state = {
     chapterIdx: 0,
