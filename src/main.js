@@ -68,9 +68,29 @@ function getCurrentChapter() {
   return chapters[state.chapterIdx];
 }
 
+function resolveSceneRef(baseRef) {
+  const chapter = getCurrentChapter();
+  const variants = chapter.scenes.filter(s =>
+    s.sceneRef.startsWith(baseRef + "_") && s.flagCondition
+  );
+  for (const variant of variants) {
+    const { flagKey, operator, value } = variant.flagCondition;
+    const current = state.flags[flagKey] ?? 0;
+    if (
+      (operator === "gte" && current >= value) ||
+      (operator === "lte" && current <= value) ||
+      (operator === "eq"  && current === value)
+    ) {
+      return variant.sceneRef;
+    }
+  }
+  return baseRef;
+}
+
 function getCurrentScene() {
   const chapter = getCurrentChapter();
-  return chapter.scenes.find(s => s.sceneRef === state.sceneRef);
+  const resolved = resolveSceneRef(state.sceneRef);
+  return chapter.scenes.find(s => s.sceneRef === resolved);
 }
 
 function render() {
@@ -95,6 +115,27 @@ function render() {
 
   const choicesDiv = document.getElementById('choices');
   choicesDiv.innerHTML = '';
+
+// Battle gate handler
+if (scene.isBattleGate) {
+  const winBtn = document.createElement('button');
+  winBtn.textContent = "⚔️ Fight";
+  winBtn.onclick = () => {
+    state.sceneRef = scene.battleWinSceneRef;
+    render();
+    renderFlags();
+  };
+  const loseBtn = document.createElement('button');
+  loseBtn.textContent = "🏳️ Retreat";
+  loseBtn.onclick = () => {
+    state.sceneRef = scene.battleLoseSceneRef;
+    render();
+    renderFlags();
+  };
+  choicesDiv.appendChild(winBtn);
+  choicesDiv.appendChild(loseBtn);
+  return;
+}
 
   if (Array.isArray(scene.choices) && scene.choices.length > 0) {
     scene.choices.forEach((choice) => {
