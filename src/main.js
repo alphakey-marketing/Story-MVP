@@ -70,7 +70,7 @@ function resolveText(text, flags) {
     .split("<br>")
     .filter(line => {
       const match = line.match(/^\{if\s+(\w+)\s*(>=|<=|==|>|<)\s*(\d+)\}/);
-      if (!match) return true; // not a conditional line — always keep
+      if (!match) return true;
       const [, flagKey, operator, rawValue] = match;
       const current = flags[flagKey] ?? 0;
       const value = Number(rawValue);
@@ -81,7 +81,7 @@ function resolveText(text, flags) {
       if (operator === "<")  return current < value;
       return false;
     })
-    .map(line => line.replace(/^\{if[^}]+\}\s*/, "")) // strip {if ...} from kept lines
+    .map(line => line.replace(/^\{if[^}]+\}\s*/, ""))
     .join("<br>");
 }
 
@@ -118,9 +118,9 @@ function render() {
   const chapter = getCurrentChapter();
   const scene = getCurrentScene();
   if (!chapter || !scene) {
-    document.getElementById('scene').innerHTML = "<b>Scene not found.</b>";
+    document.getElementById('scene-text').innerHTML = "<b>Scene not found.</b>";
     document.getElementById('choices').innerHTML = "";
-    document.getElementById('chapter-title').textContent = '';
+    document.getElementById('chapter-title-text').textContent = '';
     return;
   }
 
@@ -128,12 +128,13 @@ function render() {
   applySceneFlagWrites(scene);
   saveState();
 
-  document.getElementById('chapter-title').textContent =
+  // Write into inner spans — outer divs stay untouched so Google Translate
+  // never loses its footing when JS re-renders
+  document.getElementById('chapter-title-text').textContent =
     (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
     (chapter.subtitle ? " — " + chapter.subtitle : '');
 
-  // Use resolveText so {if ...} inline conditionals react to flags
-  document.getElementById('scene').innerHTML =
+  document.getElementById('scene-text').innerHTML =
     `<p>${resolveText(scene.text, state.flags)}</p>`;
 
   const choicesDiv = document.getElementById('choices');
@@ -144,7 +145,7 @@ function render() {
     const winBtn = document.createElement('button');
     winBtn.textContent = "⚔️ Fight";
     winBtn.onclick = () => {
-      setFlag('battle_won', 1);           // PHASE 1.3
+      setFlag('battle_won', 1);
       state.sceneRef = scene.battleWinSceneRef;
       render();
       renderFlags();
@@ -152,7 +153,7 @@ function render() {
     const loseBtn = document.createElement('button');
     loseBtn.textContent = "🏳️ Retreat";
     loseBtn.onclick = () => {
-      setFlag('battle_lost', 1);          // PHASE 1.3
+      setFlag('battle_lost', 1);
       state.sceneRef = scene.battleLoseSceneRef;
       render();
       renderFlags();
@@ -167,7 +168,6 @@ function render() {
       const btn = document.createElement('button');
       btn.textContent = choice.text;
       btn.onclick = () => {
-        // Apply flagDelta + flagDelta2 + any further deltas
         applyChoiceFlags(choice);
 
         if (!choice.nextScene) {
@@ -175,7 +175,7 @@ function render() {
             state.chapterIdx += 1;
             state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
           } else {
-            document.getElementById('scene').innerHTML =
+            document.getElementById('scene-text').innerHTML =
               '<p>End of Story. Thanks for playing!</p>';
             choicesDiv.innerHTML = '';
             renderFlags();
@@ -204,7 +204,7 @@ function render() {
         render();
         renderFlags();
       } else {
-        document.getElementById('scene').innerHTML =
+        document.getElementById('scene-text').innerHTML =
           '<p>End of Story. Thanks for playing!</p>';
         choicesDiv.innerHTML = '';
       }
