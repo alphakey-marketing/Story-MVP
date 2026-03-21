@@ -1,0 +1,49 @@
+body {
+  font-family: 'Georgia', serif;
+  background: #26241f;
+  color: #eee;
+  margin: 0;
+  min-height: 100vh;
+}
+#main {
+  max-width: 640px;
+  margin: 2em auto;
+  padding: 1.5em 2em;
+  background: #181613e8;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px #000a;
+}
+#chapter-title {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 0.6em;
+  color: #fffcbf;
+}
+.scenebg {
+  font-size: 0.95em;
+  color: #d3af63;
+  margin-bottom: 0.25em;
+}
+.dialogue {
+  margin: 1em 0;
+}
+.speaker {
+  font-weight: bold;
+  color: #c4e3ee;
+}
+.choice-btn {
+  background: #413a2b;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  margin: 0.5em 0;
+  padding: 0.75em 1.2em;
+  width: 100%;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.2s;
+}
+.choice-btn:hover {
+  background: #9b8b68;
+  color: #1e211f;
+}
