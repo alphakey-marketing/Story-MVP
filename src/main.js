@@ -114,13 +114,23 @@ function getCurrentScene() {
   return chapter.scenes.find(s => s.sceneRef === resolved);
 }
 
+// Google Translate-safe DOM write: replaces node entirely to discard any
+// <font> wrappers Translate injected, preventing NotFoundError on re-render
+function setHTML(id, html) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const fresh = el.cloneNode(false);
+  fresh.innerHTML = html;
+  el.parentNode.replaceChild(fresh, el);
+}
+
 function render() {
   const chapter = getCurrentChapter();
   const scene = getCurrentScene();
   if (!chapter || !scene) {
-    document.getElementById('scene-text').innerHTML = "<b>Scene not found.</b>";
-    document.getElementById('choices').innerHTML = "";
-    document.getElementById('chapter-title-text').textContent = '';
+    setHTML('scene-text', "<b>Scene not found.</b>");
+    setHTML('choices', "");
+    setHTML('chapter-title-text', '');
     return;
   }
 
@@ -128,17 +138,16 @@ function render() {
   applySceneFlagWrites(scene);
   saveState();
 
-  // Write into inner spans — outer divs stay untouched so Google Translate
-  // never loses its footing when JS re-renders
-  document.getElementById('chapter-title-text').textContent =
+  setHTML('chapter-title-text',
     (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
-    (chapter.subtitle ? " — " + chapter.subtitle : '');
+    (chapter.subtitle ? " — " + chapter.subtitle : ''));
 
-  document.getElementById('scene-text').innerHTML =
-    `<p>${resolveText(scene.text, state.flags)}</p>`;
+  setHTML('scene-text',
+    `<p>${resolveText(scene.text, state.flags)}</p>`);
 
+  // Clear choices, then grab fresh reference after setHTML replacement
+  setHTML('choices', '');
   const choicesDiv = document.getElementById('choices');
-  choicesDiv.innerHTML = '';
 
   // Battle gate handler (MVP)
   if (scene.isBattleGate) {
@@ -175,9 +184,8 @@ function render() {
             state.chapterIdx += 1;
             state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
           } else {
-            document.getElementById('scene-text').innerHTML =
-              '<p>End of Story. Thanks for playing!</p>';
-            choicesDiv.innerHTML = '';
+            setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
+            setHTML('choices', '');
             renderFlags();
             return;
           }
@@ -204,9 +212,8 @@ function render() {
         render();
         renderFlags();
       } else {
-        document.getElementById('scene-text').innerHTML =
-          '<p>End of Story. Thanks for playing!</p>';
-        choicesDiv.innerHTML = '';
+        setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
+        setHTML('choices', '');
       }
     };
     choicesDiv.appendChild(btn);
