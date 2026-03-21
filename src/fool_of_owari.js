@@ -1,2 +1,0 @@
-// This file just exports your entire JSON chapter data.
-export const foolOfOwariChapter = { "chapter": "Chapter 1", "scenes": [{ "sceneRef": "scene1", "dialogueLines": [{ "speakerName": "Narrator", "text": "Welcome to The Fool of Owari!" }], "choices": [{ "choiceText": "Continue", "nextSceneRef": "scene2" }] }] };
