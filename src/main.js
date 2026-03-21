@@ -70,7 +70,7 @@ function resolveText(text, flags) {
     .split("<br>")
     .filter(line => {
       const match = line.match(/^\{if\s+(\w+)\s*(>=|<=|==|>|<)\s*(\d+)\}/);
-      if (!match) return true;
+      if (!match) return true; // not a conditional line — always keep
       const [, flagKey, operator, rawValue] = match;
       const current = flags[flagKey] ?? 0;
       const value = Number(rawValue);
@@ -81,7 +81,7 @@ function resolveText(text, flags) {
       if (operator === "<")  return current < value;
       return false;
     })
-    .map(line => line.replace(/^\{if[^}]+\}\s*/, ""))
+    .map(line => line.replace(/^\{if[^}]+\}\s*/, "")) // strip {if ...} from kept lines
     .join("<br>");
 }
 
@@ -114,23 +114,13 @@ function getCurrentScene() {
   return chapter.scenes.find(s => s.sceneRef === resolved);
 }
 
-// Google Translate-safe DOM write: replaces node entirely to discard any
-// <font> wrappers Translate injected, preventing NotFoundError on re-render
-function setHTML(id, html) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const fresh = el.cloneNode(false);
-  fresh.innerHTML = html;
-  el.parentNode.replaceChild(fresh, el);
-}
-
 function render() {
   const chapter = getCurrentChapter();
   const scene = getCurrentScene();
   if (!chapter || !scene) {
-    setHTML('scene-text', "<b>Scene not found.</b>");
-    setHTML('choices', "");
-    setHTML('chapter-title-text', '');
+    document.getElementById('scene').innerHTML = "<b>Scene not found.</b>";
+    document.getElementById('choices').innerHTML = "";
+    document.getElementById('chapter-title').textContent = '';
     return;
   }
 
@@ -138,23 +128,23 @@ function render() {
   applySceneFlagWrites(scene);
   saveState();
 
-  setHTML('chapter-title-text',
+  document.getElementById('chapter-title').textContent =
     (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
-    (chapter.subtitle ? " — " + chapter.subtitle : ''));
+    (chapter.subtitle ? " — " + chapter.subtitle : '');
 
-  setHTML('scene-text',
-    `<p>${resolveText(scene.text, state.flags)}</p>`);
+  // Use resolveText so {if ...} inline conditionals react to flags
+  document.getElementById('scene').innerHTML =
+    `<p>${resolveText(scene.text, state.flags)}</p>`;
 
-  // Clear choices, then grab fresh reference after setHTML replacement
-  setHTML('choices', '');
   const choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
 
   // Battle gate handler (MVP)
   if (scene.isBattleGate) {
     const winBtn = document.createElement('button');
     winBtn.textContent = "⚔️ Fight";
     winBtn.onclick = () => {
-      setFlag('battle_won', 1);
+      setFlag('battle_won', 1);           // PHASE 1.3
       state.sceneRef = scene.battleWinSceneRef;
       render();
       renderFlags();
@@ -162,7 +152,7 @@ function render() {
     const loseBtn = document.createElement('button');
     loseBtn.textContent = "🏳️ Retreat";
     loseBtn.onclick = () => {
-      setFlag('battle_lost', 1);
+      setFlag('battle_lost', 1);          // PHASE 1.3
       state.sceneRef = scene.battleLoseSceneRef;
       render();
       renderFlags();
@@ -177,6 +167,7 @@ function render() {
       const btn = document.createElement('button');
       btn.textContent = choice.text;
       btn.onclick = () => {
+        // Apply flagDelta + flagDelta2 + any further deltas
         applyChoiceFlags(choice);
 
         if (!choice.nextScene) {
@@ -184,8 +175,9 @@ function render() {
             state.chapterIdx += 1;
             state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
           } else {
-            setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
-            setHTML('choices', '');
+            document.getElementById('scene').innerHTML =
+              '<p>End of Story. Thanks for playing!</p>';
+            choicesDiv.innerHTML = '';
             renderFlags();
             return;
           }
@@ -212,8 +204,9 @@ function render() {
         render();
         renderFlags();
       } else {
-        setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
-        setHTML('choices', '');
+        document.getElementById('scene').innerHTML =
+          '<p>End of Story. Thanks for playing!</p>';
+        choicesDiv.innerHTML = '';
       }
     };
     choicesDiv.appendChild(btn);
