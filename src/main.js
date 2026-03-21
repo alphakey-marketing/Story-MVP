@@ -163,24 +163,29 @@ if (scene.isBattleGate) {
       };
       choicesDiv.appendChild(btn);
     });
+
   } else {
-    // No choices: offer Continue / chapter advance
-    const btn = document.createElement('button');
-    btn.textContent = "Continue";
-    btn.onclick = () => {
-      if (state.chapterIdx < chapters.length - 1) {
-        state.chapterIdx += 1;
-        state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
-        render();
-        renderFlags();
-      } else {
-        document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
-        choicesDiv.innerHTML = '';
-      }
-    };
-    choicesDiv.appendChild(btn);
-  }
-  renderFlags();
+  // No choices: go to nextScene if present, otherwise advance chapter
+  const btn = document.createElement('button');
+  btn.textContent = "Continue";
+  btn.onclick = () => {
+    if (scene.nextScene) {
+      // Scene has an explicit next — follow it
+      state.sceneRef = scene.nextScene;
+      render();
+      renderFlags();
+    } else if (state.chapterIdx < chapters.length - 1) {
+      // True end of chapter — advance to next
+      state.chapterIdx += 1;
+      state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
+      render();
+      renderFlags();
+    } else {
+      document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
+      choicesDiv.innerHTML = '';
+    }
+  };
+  choicesDiv.appendChild(btn);
 }
 
 function renderFlags() {
