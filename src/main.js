@@ -43,7 +43,7 @@ function setFlag(key, value) {
   }
 }
 
-// ✅ FIX BUG 2: Walk flagDelta, flagDelta2, flagDelta3... until none found
+// FIX BUG 2: Walk flagDelta, flagDelta2, flagDelta3... until none found
 function applyChoiceFlags(choice) {
   let i = 1;
   let key = "flagDelta";
@@ -55,7 +55,7 @@ function applyChoiceFlags(choice) {
   }
 }
 
-// ✅ FIX BUG 3: Apply scene-level flagWrites when entering a scene
+// FIX BUG 3: Apply scene-level flagWrites when entering a scene
 function applySceneFlagWrites(scene) {
   if (Array.isArray(scene.flagWrites)) {
     scene.flagWrites.forEach(({ flagKey, flagValue }) => {
@@ -103,7 +103,7 @@ function render() {
     return;
   }
 
-  // ✅ FIX BUG 3: Apply scene-level flags on entry, BEFORE saving
+  // FIX BUG 3: Apply scene-level flags on entry, BEFORE saving
   applySceneFlagWrites(scene);
   saveState();
 
@@ -116,33 +116,33 @@ function render() {
   const choicesDiv = document.getElementById('choices');
   choicesDiv.innerHTML = '';
 
-// Battle gate handler
-if (scene.isBattleGate) {
-  const winBtn = document.createElement('button');
-  winBtn.textContent = "⚔️ Fight";
-  winBtn.onclick = () => {
-    state.sceneRef = scene.battleWinSceneRef;
-    render();
-    renderFlags();
-  };
-  const loseBtn = document.createElement('button');
-  loseBtn.textContent = "🏳️ Retreat";
-  loseBtn.onclick = () => {
-    state.sceneRef = scene.battleLoseSceneRef;
-    render();
-    renderFlags();
-  };
-  choicesDiv.appendChild(winBtn);
-  choicesDiv.appendChild(loseBtn);
-  return;
-}
+  // Battle gate handler
+  if (scene.isBattleGate) {
+    const winBtn = document.createElement('button');
+    winBtn.textContent = "⚔️ Fight";
+    winBtn.onclick = () => {
+      state.sceneRef = scene.battleWinSceneRef;
+      render();
+      renderFlags();
+    };
+    const loseBtn = document.createElement('button');
+    loseBtn.textContent = "🏳️ Retreat";
+    loseBtn.onclick = () => {
+      state.sceneRef = scene.battleLoseSceneRef;
+      render();
+      renderFlags();
+    };
+    choicesDiv.appendChild(winBtn);
+    choicesDiv.appendChild(loseBtn);
+    return;
+  }
 
   if (Array.isArray(scene.choices) && scene.choices.length > 0) {
     scene.choices.forEach((choice) => {
       const btn = document.createElement('button');
       btn.textContent = choice.text;
       btn.onclick = () => {
-        // ✅ FIX BUG 2: Apply flagDelta + flagDelta2 + any further deltas
+        // FIX BUG 2: Apply flagDelta + flagDelta2 + any further deltas
         applyChoiceFlags(choice);
 
         if (!choice.nextScene) {
@@ -163,33 +163,31 @@ if (scene.isBattleGate) {
       };
       choicesDiv.appendChild(btn);
     });
-
   } else {
-  // No choices: go to nextScene if present, otherwise advance chapter
-  const btn = document.createElement('button');
-  btn.textContent = "Continue";
-  btn.onclick = () => {
-    if (scene.nextScene) {
-      // Scene has an explicit next — follow it
-      state.sceneRef = scene.nextScene;
-      render();
-      renderFlags();
-    } else if (state.chapterIdx < chapters.length - 1) {
-      // True end of chapter — advance to next
-      state.chapterIdx += 1;
-      state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
-      render();
-      renderFlags();
-    } else {
-      document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
-      choicesDiv.innerHTML = '';
-    }
-  };
-  choicesDiv.appendChild(btn);
-}
+    // No choices: go to nextScene if present, otherwise advance chapter
+    const btn = document.createElement('button');
+    btn.textContent = "Continue";
+    btn.onclick = () => {
+      if (scene.nextScene) {
+        state.sceneRef = scene.nextScene;
+        render();
+        renderFlags();
+      } else if (state.chapterIdx < chapters.length - 1) {
+        state.chapterIdx += 1;
+        state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
+        render();
+        renderFlags();
+      } else {
+        document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
+        choicesDiv.innerHTML = '';
+      }
+    };
+    choicesDiv.appendChild(btn);
+  }
+  renderFlags();
+} // ← render() closes here
 
 function renderFlags() {
-  // Optional debug panel — add <div id="flags"></div> to index.html to enable
   const flagDiv = document.getElementById('flags');
   if (!flagDiv) return;
   const flags = getAllFlags();
