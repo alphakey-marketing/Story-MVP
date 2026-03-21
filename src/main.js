@@ -64,6 +64,27 @@ function applySceneFlagWrites(scene) {
   }
 }
 
+// PHASE 1.1 + 1.2: Parse {if flagKey operator value} conditional lines in scene text
+function resolveText(text, flags) {
+  return text
+    .split("<br>")
+    .filter(line => {
+      const match = line.match(/^\{if\s+(\w+)\s*(>=|<=|==|>|<)\s*(\d+)\}/);
+      if (!match) return true; // not a conditional line — always keep
+      const [, flagKey, operator, rawValue] = match;
+      const current = flags[flagKey] ?? 0;
+      const value = Number(rawValue);
+      if (operator === ">=") return current >= value;
+      if (operator === "<=") return current <= value;
+      if (operator === "==") return current === value;
+      if (operator === ">")  return current > value;
+      if (operator === "<")  return current < value;
+      return false;
+    })
+    .map(line => line.replace(/^\{if[^}]+\}\s*/, "")) // strip {if ...} from kept lines
+    .join("<br>");
+}
+
 function getCurrentChapter() {
   return chapters[state.chapterIdx];
 }
@@ -103,7 +124,7 @@ function render() {
     return;
   }
 
-  // FIX BUG 3: Apply scene-level flags on entry, BEFORE saving
+  // Apply scene-level flags on entry, BEFORE saving
   applySceneFlagWrites(scene);
   saveState();
 
@@ -111,16 +132,19 @@ function render() {
     (chapter.title || "Chapter " + (state.chapterIdx + 1)) +
     (chapter.subtitle ? " — " + chapter.subtitle : '');
 
-  document.getElementById('scene').innerHTML = `<p>${scene.text}</p>`;
+  // Use resolveText so {if ...} inline conditionals react to flags
+  document.getElementById('scene').innerHTML =
+    `<p>${resolveText(scene.text, state.flags)}</p>`;
 
   const choicesDiv = document.getElementById('choices');
   choicesDiv.innerHTML = '';
 
-  // Battle gate handler
+  // Battle gate handler (MVP)
   if (scene.isBattleGate) {
     const winBtn = document.createElement('button');
     winBtn.textContent = "⚔️ Fight";
     winBtn.onclick = () => {
+      setFlag('battle_won', 1);           // PHASE 1.3
       state.sceneRef = scene.battleWinSceneRef;
       render();
       renderFlags();
@@ -128,6 +152,7 @@ function render() {
     const loseBtn = document.createElement('button');
     loseBtn.textContent = "🏳️ Retreat";
     loseBtn.onclick = () => {
+      setFlag('battle_lost', 1);          // PHASE 1.3
       state.sceneRef = scene.battleLoseSceneRef;
       render();
       renderFlags();
@@ -142,7 +167,7 @@ function render() {
       const btn = document.createElement('button');
       btn.textContent = choice.text;
       btn.onclick = () => {
-        // FIX BUG 2: Apply flagDelta + flagDelta2 + any further deltas
+        // Apply flagDelta + flagDelta2 + any further deltas
         applyChoiceFlags(choice);
 
         if (!choice.nextScene) {
@@ -150,7 +175,8 @@ function render() {
             state.chapterIdx += 1;
             state.sceneRef = chapters[state.chapterIdx].scenes[0].sceneRef;
           } else {
-            document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
+            document.getElementById('scene').innerHTML =
+              '<p>End of Story. Thanks for playing!</p>';
             choicesDiv.innerHTML = '';
             renderFlags();
             return;
@@ -178,14 +204,15 @@ function render() {
         render();
         renderFlags();
       } else {
-        document.getElementById('scene').innerHTML = '<p>End of Story. Thanks for playing!</p>';
+        document.getElementById('scene').innerHTML =
+          '<p>End of Story. Thanks for playing!</p>';
         choicesDiv.innerHTML = '';
       }
     };
     choicesDiv.appendChild(btn);
   }
   renderFlags();
-} // ← render() closes here
+}
 
 function renderFlags() {
   const flagDiv = document.getElementById('flags');
