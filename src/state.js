@@ -1,7 +1,7 @@
 import { chapters } from './chaptersIndex.js';
 import { buildDefaultFlags, assertFlagKey } from './flags.js';
 
-export const SAVE_KEY = "story-mvp:progress:v2";
+export const SAVE_KEY = "story-mvp:progress:v3"; // bumped — new flags added
 
 export let state = {
   chapterIdx: 0,
@@ -25,14 +25,13 @@ export function loadState() {
       ) {
         state.chapterIdx = parsed.chapterIdx;
         state.sceneRef   = parsed.sceneRef;
-        state.flags      = parsed.flags;
+        state.flags      = { ...buildDefaultFlags(), ...parsed.flags };
       }
-    } catch {
-      /* Ignore broken saves */
-    }
+    } catch { /* Ignore broken saves */ }
   }
 }
 
+// Additive — existing behaviour unchanged
 export function setFlag(key, value) {
   try {
     assertFlagKey(key);
@@ -40,9 +39,15 @@ export function setFlag(key, value) {
       ? (state.flags[key] || 0) + value
       : value
     );
-  } catch {
-    // Ignore if key is not in registry
-  }
+  } catch { }
+}
+
+// Hard-set — for blade_legacy, mino_resolved, ending_route
+export function setFlagHard(key, value) {
+  try {
+    assertFlagKey(key);
+    state.flags[key] = value;
+  } catch { }
 }
 
 export function applyChoiceFlags(choice) {
@@ -54,12 +59,22 @@ export function applyChoiceFlags(choice) {
     i++;
     key = "flagDelta" + i;
   }
+  // Hard-set support: flagHardSet: { flagKey, value }
+  if (choice.flagHardSet) {
+    setFlagHard(choice.flagHardSet.flagKey, choice.flagHardSet.value);
+  }
 }
 
 export function applySceneFlagWrites(scene) {
   if (Array.isArray(scene.flagWrites)) {
     scene.flagWrites.forEach(({ flagKey, flagValue }) => {
       setFlag(flagKey, flagValue);
+    });
+  }
+  // Hard-set support: flagHardWrites: [{ flagKey, flagValue }]
+  if (Array.isArray(scene.flagHardWrites)) {
+    scene.flagHardWrites.forEach(({ flagKey, flagValue }) => {
+      setFlagHard(flagKey, flagValue);
     });
   }
 }

@@ -202,7 +202,8 @@ const chapter = {
         {
           text: "\"Grief is a private matter. We have a war in front of us. Mourn after.\"",
           nextScene: "S06A",
-          flagDelta: { flagKey: "mitsuhide_loyalty", delta: -2 }
+          flagDelta: { flagKey: "mitsuhide_loyalty", delta: -2 },
+          flagDelta2: { flagKey: "ruthlessness", delta: 1 }
         },
         {
           text: "\"I didn't know he was there. I should have known. I am sorry, Mitsuhide.\"",

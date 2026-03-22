@@ -86,7 +86,7 @@ const chapter = {
           text: "\"I trust no outsiders. Be gone.\"",
           nextScene: "S05",
           flagDelta: { flagKey: "mitsuhide_loyalty", delta: -1 },
-          flagDelta2: { flagKey: "ruthlessness", delta: 1 }
+          flagDelta2: { flagKey: "bond_strength", delta: 1 }
         }
       ]
     },

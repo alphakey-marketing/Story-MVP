@@ -70,6 +70,7 @@ const chapter = {
       ].join("<br>"),
       backgroundKey: "mountain_inn_interior",
       bgmKey: "bgm_intrigue",
+      flagWrites: [{ flagKey: "kenshin_verdict", flagValue: 1 }],
       choices: [],
       nextScene: "S04"
     },
@@ -82,6 +83,7 @@ const chapter = {
       ].join("<br>"),
       backgroundKey: "mountain_inn_interior",
       bgmKey: "bgm_intrigue",
+      flagWrites: [{ flagKey: "kenshin_verdict", flagValue: 1 }],
       choices: [],
       nextScene: "S04"
     },
@@ -96,6 +98,7 @@ const chapter = {
       ].join("<br>"),
       backgroundKey: "mountain_inn_interior",
       bgmKey: "bgm_intrigue",
+      flagWrites: [{ flagKey: "kenshin_verdict", flagValue: 1 }],
       choices: [],
       nextScene: "S04"
     },
@@ -281,8 +284,7 @@ const chapter = {
         {
           text: "Accept the blade. Have it mounted in the campaign room.",
           nextScene: "S18A",
-          flagDelta: { flagKey: "weapon_legacy", delta: 1 }
-        },
+          flagHardSet: { flagKey: "blade_legacy", value: 3 }  // reforged = 3
         {
           text: "Return it to the smith. A reforged blade is not the same blade. He should keep the work.",
           nextScene: "S18B",

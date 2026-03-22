@@ -190,7 +190,7 @@ const chapter = {
           text: "March to meet him. Not to fight — to stand in front of him personally with enough men that the number is the message.",
           nextScene: "S05A",
           flagDelta: { flagKey: "ruthlessness", delta: 1 },
-          flagDelta2: { flagKey: "political_power", delta: 1 }
+          flagDelta2: { flagKey: "ieyasu_trust", delta: 1 }
         },
         {
           text: "Send Ieyasu. Let the new alliance do its first work. Nobuyasu is Mikawa-adjacent — Ieyasu will read the situation correctly.",

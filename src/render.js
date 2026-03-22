@@ -1,7 +1,9 @@
 import { chapters } from './chaptersIndex.js';
 import { state, saveState, setFlag, applyChoiceFlags, applySceneFlagWrites } from './state.js';
-import { getCurrentChapter, getCurrentScene, resolveText } from './scene.js';
+import { getCurrentChapter, getCurrentScene, resolveText, evaluateEnding } from './scene.js';
 import { setHTML, applyBackground, showChapterCard, renderFlagBar, renderWithFade } from './ui.js';
+
+const FINAL_CHAPTER_IDX = 12; // Chapter 13 is index 12 (0-based)
 
 export function render() {
   const chapter = getCurrentChapter();
@@ -12,6 +14,11 @@ export function render() {
     setHTML('choices', "");
     setHTML('chapter-title-text', '');
     return;
+  }
+
+  // Evaluate ending route exactly once when entering Ch13
+  if (state.chapterIdx === FINAL_CHAPTER_IDX) {
+    evaluateEnding();
   }
 
   applySceneFlagWrites(scene);
@@ -58,7 +65,6 @@ export function render() {
       btn.textContent = choice.text;
       btn.onclick = () => {
         applyChoiceFlags(choice);
-
         if (!choice.nextScene) {
           if (state.chapterIdx < chapters.length - 1) {
             const nextIdx = state.chapterIdx + 1;
