@@ -3,7 +3,7 @@ import { state, saveState, setFlag, applyChoiceFlags, applySceneFlagWrites } fro
 import { getCurrentChapter, getCurrentScene, resolveText, evaluateEnding } from './scene.js';
 import { setHTML, applyBackground, showChapterCard, renderFlagBar, renderWithFade } from './ui.js';
 
-const FINAL_CHAPTER_IDX = 12; // Chapter 13 is index 12 (0-based)
+const FINAL_CHAPTER_IDX = chapters.length - 1; // Dynamic — no longer hardcoded
 
 export function render() {
   const chapter = getCurrentChapter();
@@ -16,12 +16,14 @@ export function render() {
     return;
   }
 
-  // Evaluate ending route exactly once when entering Ch13
+  // FIXED: Apply scene flag writes FIRST, then evaluate ending on Ch13
+  // Previously evaluateEnding() fired before applySceneFlagWrites, reading stale flags
+  applySceneFlagWrites(scene);
+
   if (state.chapterIdx === FINAL_CHAPTER_IDX) {
     evaluateEnding();
   }
 
-  applySceneFlagWrites(scene);
   saveState();
 
   if (scene.backgroundKey) applyBackground(scene.backgroundKey);

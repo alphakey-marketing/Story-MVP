@@ -37,9 +37,10 @@ export function showChapterCard(chapter, done) {
 }
 
 const FLAG_MAX = 8;
+// FIXED: removed dead keys 'weapon_legacy' and 'road_command' — not in flag_registry.json
 const FLAG_BAR_KEYS = [
   'ruthlessness', 'political_power', 'mitsuhide_loyalty',
-  'bond_strength', 'weapon_legacy', 'road_command'
+  'bond_strength', 'nohime_trust', 'ieyasu_trust'
 ];
 
 export function renderFlagBar() {

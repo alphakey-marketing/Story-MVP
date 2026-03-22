@@ -20,6 +20,9 @@ export function loadState() {
       const parsed = JSON.parse(s);
       if (
         typeof parsed.chapterIdx === "number" &&
+        // FIXED: bounds-check chapterIdx to prevent crash on corrupted saves
+        parsed.chapterIdx >= 0 &&
+        parsed.chapterIdx < chapters.length &&
         typeof parsed.sceneRef   === "string" &&
         typeof parsed.flags      === "object"
       ) {
@@ -39,7 +42,10 @@ export function setFlag(key, value) {
       ? (state.flags[key] || 0) + value
       : value
     );
-  } catch { }
+  } catch (e) {
+    // FIXED: was silent catch — now warns so authoring typos are visible in dev
+    console.warn("[setFlag]", e.message);
+  }
 }
 
 // Hard-set — for blade_legacy, mino_resolved, ending_route
@@ -47,7 +53,9 @@ export function setFlagHard(key, value) {
   try {
     assertFlagKey(key);
     state.flags[key] = value;
-  } catch { }
+  } catch (e) {
+    console.warn("[setFlagHard]", e.message);
+  }
 }
 
 export function applyChoiceFlags(choice) {

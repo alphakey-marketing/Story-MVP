@@ -15,6 +15,11 @@ export const BG_MAP = {
   honnoji_burning_inner_hall:      'bg-battle',
   honnoji_burning_final:           'bg-battle',
   honnoji_dawn_aftermath:          'bg-dawn',
+  // FIXED: added missing keys used by Ch13 IF and Mythic endings
+  honnoji_temple_gate_night:       'bg-temple',
+  honnoji_temple_gate_dawn:        'bg-dawn',
+  kyoto_street_market_dawn:        'bg-court',
+  gifu_castle_garden_evening:      'bg-night',
   mino_border_autumn_fog:          'bg-field',
   mino_dosan_manor:                'bg-court',
   mino_garden_autumn:              'bg-field',

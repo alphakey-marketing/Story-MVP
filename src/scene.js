@@ -1,6 +1,6 @@
 import { chapters } from './chaptersIndex.js';
-import { state } from './state.js';
-import { setFlagHard } from './state.js';
+// FIXED: merged two separate imports of state.js into one
+import { state, setFlagHard } from './state.js';
 
 export function resolveText(text, flags) {
   return text
