@@ -46,7 +46,7 @@ const chapter = {
           flagDelta2: { flagKey: "bond_strength", delta: 1 }
         },
         {
-          text: "\"Hold the Asai. I don't care how. I need your flank to hold.",
+          text: "\"Hold the Asai. I don't care how. I need your flank to hold.\"",
           nextScene: "S03B",
           flagDelta: { flagKey: "ieyasu_trust", delta: 1 },
           flagDelta2: { flagKey: "ruthlessness", delta: 1 }
