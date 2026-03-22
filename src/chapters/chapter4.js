@@ -318,8 +318,7 @@ const chapter = {
         {
           text: "Accept it. Send back a reply: 'As it always will.'",
           nextScene: "S10A",
-          flagDelta: { flagKey: "weapon_legacy", delta: 1 },
-          flagDelta2: { flagKey: "katsuie_loyalty", delta: 1 }
+          flagDelta: { flagKey: "katsuie_loyalty", delta: 1 }
         },
         {
           text: "Return it with a note: a general's blade belongs in the field, not on a lord's table.",

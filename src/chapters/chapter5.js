@@ -284,7 +284,8 @@ const chapter = {
         {
           text: "Accept the blade. Have it mounted in the campaign room.",
           nextScene: "S18A",
-        flagHardSet: { flagKey: "blade_legacy", value: 3 }  // reforged = 3
+          flagHardSet: { flagKey: "blade_legacy", value: 3 }
+        },    
         {
           text: "Return it to the smith. A reforged blade is not the same blade. He should keep the work.",
           nextScene: "S18B",
