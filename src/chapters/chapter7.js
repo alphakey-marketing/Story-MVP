@@ -265,8 +265,8 @@ const chapter = {
         "<b>Nohime:</b> Which is?",
         "<b>Nobunaga:</b> The roads. Open. For everyone. That’s the whole answer.",
         // Conditional lines
-        "{if ch7_battle_won = 0} He paid for the answer today. The road cost something and it is open anyway, which is the only kind of answer worth having.",
-        "{if ch7_battle_won = 1} The road opened on the first push. The answer is clean and the cost was low, which makes it, for the moment, feel exactly like the truth.",
+        "{if ch7_battle_won == 0} He paid for the answer today. The road cost something and it is open anyway, which is the only kind of answer worth having.",
+        "{if ch7_battle_won == 1} The road opened on the first push. The answer is clean and the cost was low, which makes it, for the moment, feel exactly like the truth.",
         "Nohime looks at the blue silk in her hands. Then at him. She does not say anything, which means she believes him, which is rarer and worth more than any alliance."
       ].join("<br>"),
       backgroundKey: "gifu_castle_tower_night",

@@ -117,6 +117,13 @@
       "writtenByChapters": [4,11]
     },
     {
+      "flagKey": "ch7_battle_won",
+      "defaultValue": 0,
+      "label": "Ch7 Road Cleared",
+      "description": "Tracks whether the Kyoto gate road was cleared on the first push in Ch7. Used for conditional epilogue text in Ch7 S10.",
+      "writtenByChapters": [7]
+    },
+    {
       "flagKey": "battle_won",
       "defaultValue": 0,
       "label": "Battles Won",
