@@ -75,18 +75,19 @@ const chapter = {
         {
           text: "\"Welcome. A brilliant mind is rare — I'd be a fool to turn one away.\"",
           nextScene: "S05",
-          flagDelta: { flagKey: "mitsuhide_loyalty", delta: 2 },
-          flagDelta2: { flagKey: "bond_strength", delta: 1 }
+          flagDelta:  { flagKey: "mitsuhide_loyalty", delta: 2 },
+          flagDelta2: { flagKey: "bond_strength",     delta: 1 }
         },
         {
           text: "\"Prove yourself first. Fetch water from the well.\"",
           nextScene: "S05"
         },
         {
+          // FIX: was bond_strength +1, corrected to -1
           text: "\"I trust no outsiders. Be gone.\"",
           nextScene: "S05",
-          flagDelta: { flagKey: "mitsuhide_loyalty", delta: -1 },
-          flagDelta2: { flagKey: "bond_strength", delta: 1 }
+          flagDelta:  { flagKey: "mitsuhide_loyalty", delta: -1 },
+          flagDelta2: { flagKey: "bond_strength",     delta: -1 }
         }
       ]
     },
@@ -108,8 +109,8 @@ const chapter = {
         {
           text: "\"Destroy it. Superstition breeds weakness in my men.\"",
           nextScene: "S06B",
-          flagDelta: { flagKey: "supernatural_affinity", delta: -1 },
-          flagDelta2: { flagKey: "mitsuhide_loyalty", delta: 1 }
+          flagDelta:  { flagKey: "supernatural_affinity", delta: -1 },
+          flagDelta2: { flagKey: "mitsuhide_loyalty",     delta: 1 }
         }
       ]
     },
@@ -123,12 +124,15 @@ const chapter = {
       ].join("<br>"),
       backgroundKey: "owari_castle_armory_night",
       bgmKey: "bgm_ominous",
-      choices: [],
-      nextScene: "S07",
+      // FIX: weapon_legacy removed — replaced by blade_legacy hard-set
+      flagHardWrites: [
+        { flagKey: "blade_legacy", flagValue: 2 }
+      ],
       flagWrites: [
-        { flagKey: "weapon_legacy", flagValue: 1 },
         { flagKey: "omen_read", flagValue: 1 }
-      ]
+      ],
+      choices: [],
+      nextScene: "S07"
     },
     {
       sceneRef: "S06B",
@@ -139,6 +143,10 @@ const chapter = {
       ].join("<br>"),
       backgroundKey: "nagashino_ruins_ash",
       bgmKey: "bgm_resolve",
+      // FIX: blade_legacy hard-set to 1 (destroyed)
+      flagHardWrites: [
+        { flagKey: "blade_legacy", flagValue: 1 }
+      ],
       choices: [],
       nextScene: "S07"
     },

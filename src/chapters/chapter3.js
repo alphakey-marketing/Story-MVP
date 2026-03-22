@@ -182,12 +182,14 @@ const chapter = {
           nextScene: "S06B",
           flagDelta: { flagKey: "political_power", delta: 1 }
         },
-        {
-          text: "Send Mitsuhide ahead to negotiate passage formally. Yoshitatsu gets his incident in writing — which becomes evidence later.",
-          nextScene: "S06C",
-          flagDelta: { flagKey: "mitsuhide_loyalty", delta: 1 },
-          flagDelta2: { flagKey: "political_power", delta: 2 }
-        }
+        // ONLY THIS CHOICE CHANGES in chapter3.js — locate S06 choices and replace S06C entry:
+{
+  // FIX: added mitsuhide_loyalty +1 — Nobunaga trusts Mitsuhide to represent him
+  text: "Send Mitsuhide ahead to negotiate passage formally. Yoshitatsu gets his incident in writing — which becomes evidence later.",
+  nextScene: "S06C",
+  flagDelta:  { flagKey: "mitsuhide_loyalty", delta: 1 },
+  flagDelta2: { flagKey: "political_power",   delta: 2 }
+}
       ]
     },
     {
@@ -223,8 +225,9 @@ const chapter = {
       backgroundKey: "mino_border_negotiation",
       bgmKey: "bgm_intrigue",
       flagWrites: [
-        { flagKey: "bond_strength", flagValue: 1 }
-      ],
+    { flagKey: "bond_strength",     flagValue: 1 },
+    { flagKey: "mitsuhide_loyalty", flagValue: 1 }  // FIX: added
+  ],
       choices: [],
       nextScene: "S08_WIN"
     },

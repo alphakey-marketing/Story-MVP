@@ -43,20 +43,20 @@ const chapter = {
         {
           text: "Accept all three terms as written. Ieyasu earned the respect of an unedited agreement.",
           nextScene: "S03A",
-          flagDelta: { flagKey: "ieyasu_trust", delta: 2 },
+          flagDelta:  { flagKey: "ieyasu_trust",    delta: 2 },
           flagDelta2: { flagKey: "political_power", delta: 1 }
         },
         {
           text: "Accept the first two terms. Remove the Shingen clause — Nobunaga doesn't pre-notify anyone of anything.",
           nextScene: "S03B",
-          flagDelta: { flagKey: "ieyasu_trust", delta: 1 },
-          flagDelta2: { flagKey: "ruthlessness", delta: 1 }
+          flagDelta:  { flagKey: "ieyasu_trust",  delta: 1 },
+          flagDelta2: { flagKey: "ruthlessness",  delta: 1 }
         },
         {
           text: "Accept everything but add a fourth term: Mikawa grain routes operate under Oda customs inspection.",
           nextScene: "S03C",
-          flagDelta: { flagKey: "political_power", delta: 2 },
-          flagDelta2: { flagKey: "ieyasu_trust", delta: -1 }
+          flagDelta:  { flagKey: "political_power", delta: 2 },
+          flagDelta2: { flagKey: "ieyasu_trust",    delta: -1 }
         }
       ]
     },
@@ -120,20 +120,20 @@ const chapter = {
         {
           text: "Grant him the council seat with real authority over northern campaign planning. He earned it.",
           nextScene: "S04A",
-          flagDelta: { flagKey: "political_power", delta: 1 },
-          flagDelta2: { flagKey: "katsuie_loyalty", delta: 2 }
+          flagDelta:  { flagKey: "political_power",  delta: 1 },
+          flagDelta2: { flagKey: "katsuie_loyalty",  delta: 2 }
         },
         {
           text: "Create an advisory council with a seat for Katsuie. Advisory only — final decisions remain yours.",
           nextScene: "S04B",
-          flagDelta: { flagKey: "katsuie_loyalty", delta: 1 },
-          flagDelta2: { flagKey: "political_power", delta: 1 }
+          flagDelta:  { flagKey: "katsuie_loyalty",  delta: 1 },
+          flagDelta2: { flagKey: "political_power",  delta: 1 }
         },
         {
           text: "Write back: his place is on the field, not in councils. That has always been his strength and Nobunaga respects it.",
           nextScene: "S04C",
-          flagDelta: { flagKey: "katsuie_loyalty", delta: -1 },
-          flagDelta2: { flagKey: "ruthlessness", delta: 1 }
+          flagDelta:  { flagKey: "katsuie_loyalty",  delta: -1 },
+          flagDelta2: { flagKey: "ruthlessness",     delta: 1 }
         }
       ]
     },
@@ -187,15 +187,17 @@ const chapter = {
       bgmKey: "bgm_war_drums",
       choices: [
         {
+          // FIX: added ieyasu_trust +1 — Nobunaga's decisiveness here
+          // is noted by Ieyasu through his Mikawa intelligence network
           text: "March to meet him. Not to fight — to stand in front of him personally with enough men that the number is the message.",
           nextScene: "S05A",
-          flagDelta: { flagKey: "ruthlessness", delta: 1 },
-          flagDelta2: { flagKey: "ieyasu_trust", delta: 1 }
+          flagDelta:  { flagKey: "ruthlessness",  delta: 1 },
+          flagDelta2: { flagKey: "ieyasu_trust",  delta: 1 }
         },
         {
           text: "Send Ieyasu. Let the new alliance do its first work. Nobuyasu is Mikawa-adjacent — Ieyasu will read the situation correctly.",
           nextScene: "S05B",
-          flagDelta: { flagKey: "ieyasu_trust", delta: 1 },
+          flagDelta:  { flagKey: "ieyasu_trust",    delta: 1 },
           flagDelta2: { flagKey: "political_power", delta: 1 }
         },
         {
@@ -259,9 +261,11 @@ const chapter = {
       bgmKey: "bgm_ominous",
       choices: [
         {
+          // FIX: weapon_legacy removed — mystery sword does not advance blade_legacy
+          // supernatural_affinity added: keeping an unknown blade is an act of openness
           text: "Keep it. A weapon offered by someone watching this closely is worth understanding.",
           nextScene: "S06_KEEP",
-          flagDelta: { flagKey: "weapon_legacy", delta: 1 }
+          flagDelta: { flagKey: "supernatural_affinity", delta: 1 }
         },
         {
           text: "Burn it with the letter. Accept nothing from an unknown hand.",
