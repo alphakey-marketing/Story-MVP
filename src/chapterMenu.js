@@ -3,13 +3,32 @@ import { state, saveState } from './state.js';
 import { render } from './render.js';
 import { renderFlagBar } from './ui.js';
 
-// ─── Track highest chapter reached ─────────────────────────────
+// ─── Track highest scene reached — clears replayMode at frontier ──
 export function updateHighestChapter() {
-  if (state.chapterIdx > state.highestChapterIdx) {
+  const currentKey = state.chapterIdx + '/' + state.sceneRef;
+
+  // Compare chapter first, then fall back to scene position within chapter
+  const [highCh, highScene] = state.highestSceneKey.split('/');
+  const highChIdx = Number(highCh);
+
+  const isAhead =
+    state.chapterIdx > highChIdx ||
+    (state.chapterIdx === highChIdx && isSceneAhead(state.sceneRef, highScene, state.chapterIdx));
+
+  if (isAhead) {
     state.highestChapterIdx = state.chapterIdx;
-    state.replayMode = false;  // advancing past the frontier — live mode
+    state.highestSceneKey   = currentKey;
+    state.replayMode        = false;  // reached new ground — live mode
     saveState();
   }
+}
+
+// Returns true if sceneRef `a` comes after `b` in the chapter's scene array
+function isSceneAhead(a, b, chapterIdx) {
+  const scenes = chapters[chapterIdx]?.scenes ?? [];
+  const idxA   = scenes.findIndex(s => s.sceneRef === a);
+  const idxB   = scenes.findIndex(s => s.sceneRef === b);
+  return idxA > idxB;
 }
 
 // ─── Build or reuse the overlay ────────────────────────────────
@@ -71,13 +90,14 @@ function buildMenuContent(overlay) {
       btn.onclick = () => {
         overlay.classList.add('hidden');
 
-        // Set replayMode: true if jumping back, false if resuming frontier
-        state.replayMode = idx < state.highestChapterIdx;
+        // Always enter replay mode on any chapter jump —
+        // updateHighestChapter() will clear it when player reaches new ground
+        state.replayMode = true;
 
         state.chapterIdx = idx;
         state.sceneRef   = chapters[idx].scenes[0].sceneRef;
 
-        // Hide epilogue if it was showing
+        // Hide epilogue if showing
         const epilogueScreen = document.getElementById('epilogue-screen');
         if (epilogueScreen) {
           epilogueScreen.classList.add('hidden');

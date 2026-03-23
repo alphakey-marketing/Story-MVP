@@ -8,7 +8,10 @@ export let state = {
   sceneRef:          chapters[0].scenes[0]?.sceneRef,
   flags:             buildDefaultFlags(),
   highestChapterIdx: 0,
-  replayMode:        false,  // true when replaying a previously completed chapter
+  highestSceneKey:   chapters[0].scenes[0]?.sceneRef
+                       ? '0/' + chapters[0].scenes[0].sceneRef
+                       : '0/',   // "chapterIdx/sceneRef" high-water mark
+  replayMode:        false,
 };
 
 export function saveState() {
@@ -33,66 +36,9 @@ export function loadState() {
         state.highestChapterIdx = (typeof parsed.highestChapterIdx === "number")
           ? Math.min(parsed.highestChapterIdx, chapters.length - 1)
           : parsed.chapterIdx;
-        // replayMode is never persisted — always starts false on load
+        state.highestSceneKey   = (typeof parsed.highestSceneKey === "string")
+          ? parsed.highestSceneKey
+          : parsed.chapterIdx + '/' + parsed.sceneRef; // fallback for old saves
+        // replayMode never persisted — always false on load
       }
-    } catch { /* Ignore broken saves */ }
-  }
-}
-
-export function setFlag(key, value) {
-  try {
-    assertFlagKey(key);
-    state.flags[key] = (typeof value === "number"
-      ? (state.flags[key] || 0) + value
-      : value
-    );
-  } catch (e) {
-    console.warn("[setFlag]", e.message);
-  }
-}
-
-export function setFlagHard(key, value) {
-  try {
-    assertFlagKey(key);
-    state.flags[key] = value;
-  } catch (e) {
-    console.warn("[setFlagHard]", e.message);
-  }
-}
-
-export function applyChoiceFlags(choice) {
-  if (state.replayMode) return;  // ← GUARD: no flag writes during replay
-  let i = 1;
-  let key = "flagDelta";
-  while (choice[key]) {
-    const { flagKey, delta } = choice[key];
-    setFlag(flagKey, delta);
-    i++;
-    key = "flagDelta" + i;
-  }
-  if (choice.flagHardSet) {
-    setFlagHard(choice.flagHardSet.flagKey, choice.flagHardSet.value);
-  }
-}
-
-export function applySceneFlagWrites(scene) {
-  if (state.replayMode) return;  // ← GUARD: no flag writes during replay
-  if (Array.isArray(scene.flagWrites)) {
-    scene.flagWrites.forEach(({ flagKey, flagValue }) => {
-      setFlag(flagKey, flagValue);
-    });
-  }
-  if (Array.isArray(scene.flagHardWrites)) {
-    scene.flagHardWrites.forEach(({ flagKey, flagValue }) => {
-      setFlagHard(flagKey, flagValue);
-    });
-  }
-}
-
-export function resetState() {
-  state.chapterIdx        = 0;
-  state.sceneRef          = chapters[0].scenes[0]?.sceneRef;
-  state.flags             = buildDefaultFlags();
-  state.highestChapterIdx = 0;
-  state.replayMode        = false;
-}
+    } catch { /* Ignore 
