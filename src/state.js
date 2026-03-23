@@ -1,12 +1,13 @@
 import { chapters } from './chaptersIndex.js';
 import { buildDefaultFlags, assertFlagKey } from './flags.js';
 
-export const SAVE_KEY = "story-mvp:progress:v3"; // bumped — new flags added
+export const SAVE_KEY = "story-mvp:progress:v4"; // bumped — highestChapterIdx added
 
 export let state = {
-  chapterIdx: 0,
-  sceneRef:   chapters[0].scenes[0]?.sceneRef,
-  flags:      buildDefaultFlags(),
+  chapterIdx:        0,
+  sceneRef:          chapters[0].scenes[0]?.sceneRef,
+  flags:             buildDefaultFlags(),
+  highestChapterIdx: 0,
 };
 
 export function saveState() {
@@ -20,21 +21,22 @@ export function loadState() {
       const parsed = JSON.parse(s);
       if (
         typeof parsed.chapterIdx === "number" &&
-        // FIXED: bounds-check chapterIdx to prevent crash on corrupted saves
         parsed.chapterIdx >= 0 &&
         parsed.chapterIdx < chapters.length &&
-        typeof parsed.sceneRef   === "string" &&
-        typeof parsed.flags      === "object"
+        typeof parsed.sceneRef === "string" &&
+        typeof parsed.flags    === "object"
       ) {
-        state.chapterIdx = parsed.chapterIdx;
-        state.sceneRef   = parsed.sceneRef;
-        state.flags      = { ...buildDefaultFlags(), ...parsed.flags };
+        state.chapterIdx        = parsed.chapterIdx;
+        state.sceneRef          = parsed.sceneRef;
+        state.flags             = { ...buildDefaultFlags(), ...parsed.flags };
+        state.highestChapterIdx = (typeof parsed.highestChapterIdx === "number")
+          ? Math.min(parsed.highestChapterIdx, chapters.length - 1)
+          : parsed.chapterIdx; // graceful fallback for old saves
       }
     } catch { /* Ignore broken saves */ }
   }
 }
 
-// Additive — existing behaviour unchanged
 export function setFlag(key, value) {
   try {
     assertFlagKey(key);
@@ -43,12 +45,10 @@ export function setFlag(key, value) {
       : value
     );
   } catch (e) {
-    // FIXED: was silent catch — now warns so authoring typos are visible in dev
     console.warn("[setFlag]", e.message);
   }
 }
 
-// Hard-set — for blade_legacy, mino_resolved, ending_route
 export function setFlagHard(key, value) {
   try {
     assertFlagKey(key);
@@ -67,7 +67,6 @@ export function applyChoiceFlags(choice) {
     i++;
     key = "flagDelta" + i;
   }
-  // Hard-set support: flagHardSet: { flagKey, value }
   if (choice.flagHardSet) {
     setFlagHard(choice.flagHardSet.flagKey, choice.flagHardSet.value);
   }
@@ -79,7 +78,6 @@ export function applySceneFlagWrites(scene) {
       setFlag(flagKey, flagValue);
     });
   }
-  // Hard-set support: flagHardWrites: [{ flagKey, flagValue }]
   if (Array.isArray(scene.flagHardWrites)) {
     scene.flagHardWrites.forEach(({ flagKey, flagValue }) => {
       setFlagHard(flagKey, flagValue);
@@ -88,7 +86,8 @@ export function applySceneFlagWrites(scene) {
 }
 
 export function resetState() {
-  state.chapterIdx = 0;
-  state.sceneRef   = chapters[0].scenes[0]?.sceneRef;
-  state.flags      = buildDefaultFlags();
+  state.chapterIdx        = 0;
+  state.sceneRef          = chapters[0].scenes[0]?.sceneRef;
+  state.flags             = buildDefaultFlags();
+  state.highestChapterIdx = 0;
 }

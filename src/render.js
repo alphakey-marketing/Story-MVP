@@ -2,8 +2,10 @@ import { chapters } from './chaptersIndex.js';
 import { state, saveState, setFlag, applyChoiceFlags, applySceneFlagWrites } from './state.js';
 import { getCurrentChapter, getCurrentScene, resolveText, evaluateEnding } from './scene.js';
 import { setHTML, applyBackground, showChapterCard, renderFlagBar, renderWithFade } from './ui.js';
+import { showEpilogue } from './epilogue.js';
+import { updateHighestChapter } from './chapterMenu.js';
 
-const FINAL_CHAPTER_IDX = chapters.length - 1; // Dynamic — no longer hardcoded
+const FINAL_CHAPTER_IDX = chapters.length - 1;
 
 export function render() {
   const chapter = getCurrentChapter();
@@ -16,8 +18,9 @@ export function render() {
     return;
   }
 
-  // FIXED: Apply scene flag writes FIRST, then evaluate ending on Ch13
-  // Previously evaluateEnding() fired before applySceneFlagWrites, reading stale flags
+  // Track furthest chapter reached for chapter menu unlock
+  updateHighestChapter();
+
   applySceneFlagWrites(scene);
 
   if (state.chapterIdx === FINAL_CHAPTER_IDX) {
@@ -77,9 +80,8 @@ export function render() {
               renderFlagBar();
             });
           } else {
-            setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
-            setHTML('choices', '');
-            renderFlagBar();
+            saveState();
+            showEpilogue(() => { resetState(); saveState(); render(); });
           }
         } else {
           state.sceneRef = choice.nextScene;
@@ -106,8 +108,8 @@ export function render() {
           renderFlagBar();
         });
       } else {
-        setHTML('scene-text', '<p>End of Story. Thanks for playing!</p>');
-        setHTML('choices', '');
+        saveState();
+        showEpilogue(() => { resetState(); saveState(); render(); });
       }
     };
     choicesDiv.appendChild(btn);

@@ -2,17 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Fool of Owari — Interactive Story MVP</title>
   <link rel="stylesheet" href="styles/base.css">
 </head>
 <body>
   <main id="main">
 
-    <!-- 2.2: Chapter title card interstitial (hidden by default) -->
+    <!-- Chapter title card interstitial -->
     <div id="chapter-card" class="chapter-card hidden">
       <div id="chapter-card-number"></div>
       <div id="chapter-card-title"></div>
       <div id="chapter-card-subtitle"></div>
+    </div>
+
+    <!-- Chapter menu button -->
+    <div id="chapter-menu-bar">
+      <button id="chapter-menu-btn">☰ Chapters</button>
     </div>
 
     <!-- Story content -->
@@ -26,7 +32,7 @@
       <div id="choices" translate="no" class="notranslate"></div>
     </div>
 
-    <!-- 2.5: Flag bar panel -->
+    <!-- Flag bar panel -->
     <div id="flag-bar">
       <div class="flag-bar-row">
         <span class="flag-label">Ruthless</span>
@@ -45,14 +51,17 @@
         <div class="flag-track"><div id="flag-bond_strength" class="flag-fill"></div></div>
       </div>
       <div class="flag-bar-row">
-  <span class="flag-label">Nohime</span>
-  <div class="flag-track"><div id="flag-nohime_trust" class="flag-fill"></div></div>
-</div>
-<div class="flag-bar-row">
-  <span class="flag-label">Ieyasu</span>
-  <div class="flag-track"><div id="flag-ieyasu_trust" class="flag-fill"></div></div>
-</div>
+        <span class="flag-label">Nohime</span>
+        <div class="flag-track"><div id="flag-nohime_trust" class="flag-fill"></div></div>
+      </div>
+      <div class="flag-bar-row">
+        <span class="flag-label">Ieyasu</span>
+        <div class="flag-track"><div id="flag-ieyasu_trust" class="flag-fill"></div></div>
+      </div>
     </div>
+
+    <!-- Epilogue summary screen -->
+    <div id="epilogue-screen" class="hidden"></div>
 
   </main>
   <script type="module" src="src/main.js"></script>
