@@ -7,6 +7,7 @@ import { renderFlagBar } from './ui.js';
 export function updateHighestChapter() {
   if (state.chapterIdx > state.highestChapterIdx) {
     state.highestChapterIdx = state.chapterIdx;
+    state.replayMode = false;  // advancing past the frontier — live mode
     saveState();
   }
 }
@@ -52,9 +53,10 @@ function buildMenuContent(overlay) {
     const btn    = document.createElement('button');
     const locked = idx > state.highestChapterIdx;
 
-    btn.className  = locked ? 'chapter-menu-item chapter-menu-item--locked'
-                            : 'chapter-menu-item';
-    btn.disabled   = locked;
+    btn.className = locked
+      ? 'chapter-menu-item chapter-menu-item--locked'
+      : 'chapter-menu-item';
+    btn.disabled = locked;
     btn.setAttribute('aria-label',
       locked ? `Chapter ${chapter.number} — locked`
              : `Jump to Chapter ${chapter.number}: ${chapter.title}`);
@@ -68,6 +70,10 @@ function buildMenuContent(overlay) {
     if (!locked) {
       btn.onclick = () => {
         overlay.classList.add('hidden');
+
+        // Set replayMode: true if jumping back, false if resuming frontier
+        state.replayMode = idx < state.highestChapterIdx;
+
         state.chapterIdx = idx;
         state.sceneRef   = chapters[idx].scenes[0].sceneRef;
 

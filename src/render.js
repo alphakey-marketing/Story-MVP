@@ -1,5 +1,6 @@
 import { chapters } from './chaptersIndex.js';
-import { state, saveState, resetState, setFlag, applyChoiceFlags, applySceneFlagWrites } from './state.js';import { getCurrentChapter, getCurrentScene, resolveText, evaluateEnding } from './scene.js';
+import { state, saveState, resetState, setFlag, applyChoiceFlags, applySceneFlagWrites } from './state.js';
+import { getCurrentChapter, getCurrentScene, resolveText, evaluateEnding } from './scene.js';
 import { setHTML, applyBackground, showChapterCard, renderFlagBar, renderWithFade } from './ui.js';
 import { showEpilogue } from './epilogue.js';
 import { updateHighestChapter } from './chapterMenu.js';
@@ -17,7 +18,7 @@ export function render() {
     return;
   }
 
-  // Track furthest chapter reached for chapter menu unlock
+  // Track furthest chapter reached — also clears replayMode if at frontier
   updateHighestChapter();
 
   applySceneFlagWrites(scene);

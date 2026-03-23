@@ -1,13 +1,14 @@
 import { chapters } from './chaptersIndex.js';
 import { buildDefaultFlags, assertFlagKey } from './flags.js';
 
-export const SAVE_KEY = "story-mvp:progress:v4"; // bumped — highestChapterIdx added
+export const SAVE_KEY = "story-mvp:progress:v4";
 
 export let state = {
   chapterIdx:        0,
   sceneRef:          chapters[0].scenes[0]?.sceneRef,
   flags:             buildDefaultFlags(),
   highestChapterIdx: 0,
+  replayMode:        false,  // true when replaying a previously completed chapter
 };
 
 export function saveState() {
@@ -31,7 +32,8 @@ export function loadState() {
         state.flags             = { ...buildDefaultFlags(), ...parsed.flags };
         state.highestChapterIdx = (typeof parsed.highestChapterIdx === "number")
           ? Math.min(parsed.highestChapterIdx, chapters.length - 1)
-          : parsed.chapterIdx; // graceful fallback for old saves
+          : parsed.chapterIdx;
+        // replayMode is never persisted — always starts false on load
       }
     } catch { /* Ignore broken saves */ }
   }
@@ -59,6 +61,7 @@ export function setFlagHard(key, value) {
 }
 
 export function applyChoiceFlags(choice) {
+  if (state.replayMode) return;  // ← GUARD: no flag writes during replay
   let i = 1;
   let key = "flagDelta";
   while (choice[key]) {
@@ -73,6 +76,7 @@ export function applyChoiceFlags(choice) {
 }
 
 export function applySceneFlagWrites(scene) {
+  if (state.replayMode) return;  // ← GUARD: no flag writes during replay
   if (Array.isArray(scene.flagWrites)) {
     scene.flagWrites.forEach(({ flagKey, flagValue }) => {
       setFlag(flagKey, flagValue);
@@ -90,4 +94,5 @@ export function resetState() {
   state.sceneRef          = chapters[0].scenes[0]?.sceneRef;
   state.flags             = buildDefaultFlags();
   state.highestChapterIdx = 0;
+  state.replayMode        = false;
 }
