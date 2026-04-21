@@ -34,13 +34,33 @@ const chapter = {
     // S02 branches to 4 endings via flagCondition on ending_route.
     // evaluateEnding() is called by render.js when entering this chapter.
     {
+      sceneRef: "S02_MYTHIC_OMEN",
+      text: [
+        "<b>Ranmaru:</b> My lord — torches. The outer wall. Thousands of them.",
+        "<b>Nobunaga:</b> Whose banner?",
+        "<b>Ranmaru:</b> Akechi, my lord.",
+        "He does not speak immediately. There is no surprise in him — only recognition. The pressure he felt tonight, the pressure he has felt at every hinge of this age, was pointing here. He has known this pressure before. He has learned not to name it until it names itself.",
+        "The reforged blade is at his side — the one with the seam, the one the monk called a completed thing. He puts his hand on it.",
+        "The temple garden is very still. Somewhere in it, at the edge of the lamplight, something moves.",
+        "<b>Nobunaga:</b> Is this the realm, then. … It cannot be helped."
+      ].join("<br>"),
+      backgroundKey: "honnoji_temple_courtyard_torches",
+      bgmKey: "bgm_ominous",
+      flagConditions: [
+        { flagKey: "ending_route", operator: "eq", value: 2 },
+        { flagKey: "omen_read",    operator: "gte", value: 2 }
+      ],
+      choices: [],
+      nextScene: "S03_MYTHIC"
+    },
+    {
       sceneRef: "S02_BAD",
       text: [
         "<b>Ranmaru:</b> My lord \u2014 torches. The outer wall. Thousands of them.",
         "<b>Nobunaga:</b> Whose banner?",
         "<b>Ranmaru:</b> Akechi, my lord.",
         "Nobunaga nods. No surprise at the name. No pause before the number. The tool reached its tolerance and broke, as tools do.",
-        "{if kennyo_hate >= 5} Among the torches, he can see the distinctive white robes of Ikko-ikki monks. Kennyo found his opening at last. He did not come alone to this betrayal.",
+        "{if kennyo_hate >= 3} Among the torches, he can see the distinctive white robes of Ikko-ikki monks. Kennyo found his opening at last. He did not come alone to this betrayal.",
         "<b>Nobunaga:</b> It cannot be helped.",
         "He says it flatly. There is no weight in it. It is a logistical observation."
       ].join("<br>"),
@@ -117,7 +137,7 @@ const chapter = {
       text: [
         "What follows Honnoji is the active erasure of Oda Nobunaga.",
         "Toyotomi Hideyoshi defeats Mitsuhide at Yamazaki. He then spends fifteen years carefully rewriting the record. The story he tells is this: Nobunaga was a demon of war whose excesses necessitated his own removal. His cruelties, which were real, are made into the whole story. The markets he opened are credited to Hideyoshi's subsequent administration. The roads he built are renamed.",
-        "{if kennyo_hate >= 5} The monks of the Ikko-ikki, who had assisted the coup at Honnoji, are granted a ceremonial pardon by Hideyoshi. Kennyo is allowed to rebuild one temple. He never publicly confirms his role in that June night. He doesn't need to.",
+        "{if kennyo_hate >= 3} The monks of the Ikko-ikki, who had assisted the coup at Honnoji, are granted a ceremonial pardon by Hideyoshi. Kennyo is allowed to rebuild one temple. He never publicly confirms his role in that June night. He doesn't need to.",
         "In a century, the name Oda Nobunaga means: a monster whose death was necessary. The cautionary tale. The lesson about what happens when power is not balanced by mercy.",
         "The markets stay open. The roads stay open. Japan does not stop.",
         "He just doesn't get credit for it."
@@ -235,7 +255,8 @@ const chapter = {
           text: "Write the final order. Three lines. The markets stay open. The roads stay open. Japan does not stop.",
           nextScene: "S03B_STD",
           flagDelta: { flagKey: "nohime_trust", delta: 1 },
-          flagDelta2: { flagKey: "political_power", delta: 1 }
+          flagDelta2: { flagKey: "political_power", delta: 1 },
+          requires: { flagKey: "political_power", min: 2 }
         }
       ]
     },
@@ -289,6 +310,20 @@ const chapter = {
       ].join("<br>"),
       backgroundKey: "honnoji_dawn_aftermath",
       bgmKey: "bgm_victory_somber",
+      choices: [],
+      nextScene: "S05A_WIN_STD"
+    },
+    {
+      sceneRef: "S05A_WIN_STD",
+      text: [
+        "Twelve days later, at the foot of Mount Tennozan, Toyotomi Hideyoshi destroys Akechi Mitsuhide at Yamazaki. The battle lasts half a day.",
+        "Nobunaga does not lead it. He is at Azuchi, wounded, directing the western campaign from a room with a view of the lake. When the rider arrives with news of Yamazaki, he reads the dispatch twice, sets it down, and looks out at the water.",
+        "Hideyoshi did not need to be told what to do. Nobunaga built a structure that continued without him needing to hold it up. That was always the point.",
+        "{if political_power >= 4} The alliances held exactly as designed. Every man in the right place. The roads open.",
+        "<b>Nobunaga:</b> Good. Tell Hideyoshi to keep moving."
+      ].join("<br>"),
+      backgroundKey: "azuchi_castle_lake_view",
+      bgmKey: "bgm_ending_theme",
       choices: [],
       nextScene: "S06_STD"
     },

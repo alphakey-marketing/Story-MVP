@@ -29,12 +29,14 @@ const chapter = {
         {
           text: '"I submit. For now. A wise lord listens before he acts."',
           nextScene: "S03A",
-          flagDelta: { flagKey: "political_power", delta: 1 }
+          flagDelta: { flagKey: "political_power", delta: 1 },
+          flagHardSet: { flagKey: "ch1_defied_council", value: 0 }
         },
         {
           text: '"Kneel to no council. I am Oda Nobunaga."',
           nextScene: "S03B",
-          flagDelta: { flagKey: "ruthlessness", delta: 1 }
+          flagDelta: { flagKey: "ruthlessness", delta: 1 },
+          flagHardSet: { flagKey: "ch1_defied_council", value: 1 }
         }
       ]
     },

@@ -19,7 +19,7 @@ const ENDINGS = {
   },
   3: {
     title:   'The Standard Bearer',
-    subtitle:'The work was the work. You did it. That counts for more than history will say.',
+    subtitle:'He held the inner hall until the fire reached the roof beams, then wrote three lines about the roads. History argued about the lines. The roads did not argue.',
     bg:      'honnoji_dawn_aftermath',
   },
 };
@@ -68,6 +68,11 @@ function buildLegacyLines(flags) {
     lines.push('Nohime noted everything. In the end she noted that you had been worth noting.');
   else if (flags.nohime_trust >= 2)
     lines.push('Nohime observed more than she was given credit for. She always did.');
+
+  if (flags.ch1_defied_council === 1)
+    lines.push('In 1551 the elders of Owari demanded submission. You told them your name. Every year after that, the name meant more. That first refusal set the pitch of everything else.');
+  else
+    lines.push('In 1551 the elders of Owari demanded submission. You listened, then acted anyway. The elders thought compliance was the lesson. It was not. It was the delay.');
 
   return lines;
 }

@@ -113,8 +113,16 @@
       "flagKey": "kennyo_hate",
       "defaultValue": 0,
       "label": "Kennyo Enmity",
-      "description": "Escalation of the Nobunaga/Kennyo conflict. Affects Ch11 Kennyo's final letter (3 variants). If >=5, Kennyo's monks appear in Bad ending at Honnoji.",
+      "description": "Escalation of the Nobunaga/Kennyo conflict. Affects Ch11 Kennyo's final letter (3 variants). If >=3, Kennyo's monks appear in Bad ending at Honnoji (reachable: Ch4 stables +2 + Ch11 naval assault +1).",
       "writtenByChapters": [4,11]
+    },
+    {
+      "flagKey": "ch1_defied_council",
+      "defaultValue": 0,
+      "label": "Defied Council",
+      "description": "Hard-set in Ch1 S02. 1 = defied the elders ('Kneel to no council'), 0 = submitted. Used for Ch.1 callback in epilogue legacy lines.",
+      "hardSet": true,
+      "writtenByChapters": [1]
     },
     {
       "flagKey": "ch7_battle_won",

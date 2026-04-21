@@ -59,6 +59,7 @@ export const BG_MAP = {
   azuchi_castle_audience_hall:     'bg-court',
   azuchi_castle_map_room:          'bg-court',
   azuchi_castle_lake_night:        'bg-night',
+  azuchi_castle_lake_view:         'bg-dawn',
   azuchi_castle_garden_autumn:     'bg-field',
   gifu_castle_tower_night:         'bg-night',
 

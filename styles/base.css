@@ -155,12 +155,106 @@ body.bg-grief            { background: #141414; }
   overflow: hidden;
 }
 
+/* ─── 2.5: Flag bar panel ──────────────────────────────── */
+#flag-bar {
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid #333;
+}
+
+.flag-bar-row {
+  display: flex;
+  align-items: center;
+  margin: 0.35em 0;
+  gap: 0.75em;
+}
+
+.flag-label {
+  width: 70px;
+  font-size: 0.75em;
+  color: #888;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.flag-track {
+  flex: 1;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
 .flag-fill {
   height: 100%;
   width: 0%;
   background: #9b8b68;
   border-radius: 3px;
   transition: width 0.4s ease;
+}
+
+/* Per-character affinity bar colors */
+#flag-ruthlessness        { background: #c0392b; }  /* deep red — force */
+#flag-political_power     { background: #8e6c1e; }  /* antique gold — leverage */
+#flag-mitsuhide_loyalty   { background: #4a7fa5; }  /* cold steel blue */
+#flag-bond_strength       { background: #7d5fa0; }  /* muted violet — humanity */
+#flag-nohime_trust        { background: #c89b2a; }  /* warm gold */
+#flag-ieyasu_trust        { background: #3e7a5a; }  /* forest green — steadiness */
+
+/* ─── Dialogue box system ──────────────────────────────────────── */
+.dialogue-line {
+  display: block;
+  margin: 0.6em 0;
+  padding: 0.4em 0.75em;
+  border-left: 3px solid #4a4030;
+  background: #1e1b14;
+  border-radius: 0 4px 4px 0;
+}
+
+.speaker {
+  display: block;
+  font-weight: bold;
+  font-size: 0.8em;
+  letter-spacing: 0.05em;
+  color: #c4e3ee;
+  margin-bottom: 0.2em;
+}
+
+.dialogue-text {
+  display: block;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.narration {
+  color: #bbb;
+  font-style: italic;
+  margin: 0.6em 0;
+  line-height: 1.6;
+}
+
+/* ─── Typewriter skip button ───────────────────────────────────── */
+.tw-skip-btn {
+  display: inline-block;
+  background: transparent;
+  color: #555;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.2em 0.7em;
+  font-size: 0.75em;
+  font-family: 'Georgia', serif;
+  cursor: pointer;
+  margin-bottom: 0.75em;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tw-skip-btn:hover {
+  color: #9b8b68;
+  border-color: #9b8b68;
+}
+
+.tw-skip-btn.hidden {
+  display: none;
 }
 /* ─── Chapter menu bar ─────────────────────────────────────── */
 #chapter-menu-bar {
