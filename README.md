@@ -47,3 +47,10 @@ Screen shake / flash on dramatic moments — one CSS class trigger on betrayal/b
 Multiple POV chapters — experience scenes from Mitsuhide, Hideyoshi, or Ieyasu's perspective
 
 💰 v2.5 — Monetization & Growth
+Chapter unlock model — Ch. 1–2 free, subsequent chapters paid or time-gated
+
+Shareable ending cards — auto-generated image with ending title players can post on social media
+
+Collector's codex — lore encyclopedia that fills in as players progress; completionists replay to fill it
+
+Premium CG illustrations — key dramatic/romantic scenes with full artwork unlockable as DLC
