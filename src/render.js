@@ -69,7 +69,7 @@ function startTypewriter(fullHTML, skipBtn) {
 function renderSceneHTML(rawText) {
   const lines = rawText.split('<br>');
   return lines.map(line => {
-    const m = line.match(/^<b>([^<:]+):<\/b>\s*(.*)/s);
+    const m = line.match(/^<b>([^<:]+):<\/b>\s*(.*)/);
     if (m) {
       return `<div class="dialogue-line"><span class="speaker">${m[1]}</span><span class="dialogue-text">${m[2]}</span></div>`;
     }
@@ -265,7 +265,7 @@ export function render() {
   // Override skip to build choices immediately on skip
   const origSkipFn = skipBtn.onclick;
   skipBtn.onclick = () => {
-    origSkipFn && origSkipFn();
+    if (origSkipFn) origSkipFn();
     buildChoicesOnce();
   };
 
