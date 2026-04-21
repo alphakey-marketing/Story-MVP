@@ -1,92 +1,49 @@
-# Story-MVP — Product Requirements (MVP)
+✅ Already Built (Your MVP Foundation)
+Scene navigation with choice buttons
 
-Repository: alphakey-marketing/Story-MVP  
-Description: An interactive story MVP version
+Boolean + numeric flag system (setFlag, setFlagHard, applyChoiceFlags)
 
-Language composition:
-- JavaScript: 38.5%
-- HTML: 36.8%
-- CSS: 24.7%
+Affinity bars for mitsuhide_loyalty, nohime_trust, ieyasu_trust, ruthlessness, political_power, bond_strength
 
-## Overview
-This tiny PRD defines the minimum viable product for an interactive story: a single playable chapter that demonstrates scene navigation, a simple flag system, and progress persistence. The interface will be a small single-page app using plain JavaScript, minimal HTML, and simple CSS.
+Chapter menu + epilogue module
 
-## MVP goals
-- One playable chapter of your story (10–15 scenes).
-- Scene navigation: current scene → render text/choices → click → next scene.
-- Flag system: simple boolean flags (e.g. `visited_dojo: true`).
-- Save progress: `localStorage` or URL fragments.
-- Styling: minimal CSS (no component library needed).
+Background map per scene (bgMap.js)
 
-## Acceptance criteria
-- Player can play through a chapter of 10–15 scenes from start to finish.
-- Each scene displays narrative text and 1–3 choice buttons that navigate to other scenes.
-- Choosing a choice can set or check boolean flags.
-- Flags are persisted during the session and saved/loaded from `localStorage` (or encoded in the URL fragment).
-- Player progress can be restored after a page reload.
-- Styling is clean and minimal; layout works on desktop and mobile.
+localStorage save/load with replay mode lock
 
-## Technical approach
-- Single HTML page (index.html) with a small JS bundle (plain ES module or single script).
-- Scene data stored in a JSON file or JS object:
-```
-{
-  "start": {
-    "id": "start",
-    "text": "You arrive at the dojo. What do you do?",
-    "choices": [
-      { "text": "Enter", "next": "dojo_enter", "set": { "visited_dojo": true } },
-      { "text": "Walk away", "next": "walk_away" }
-    ]
-  },
-  "dojo_enter": {
-    "id": "dojo_enter",
-    "text": "A teacher greets you.",
-    "choices": [
-      { "text": "Bow", "next": "bow_scene" }
-    ]
-  }
-}
-```
-- State model:
-  - currentSceneId: string
-  - flags: Record<string, boolean>
-- Persistence:
-  - Primary: `localStorage` key (e.g., `story-mvp:save`) storing JSON { currentSceneId, flags }.
-  - Alternative/optional: encode currentSceneId and flags in the URL fragment for shareable state.
-- UI:
-  - Render scene text and choices; each choice triggers state updates (set/unset flags) and navigates to the next scene.
-  - Minimal transitions (fade/slide) optional but not required.
+🔧 v1.0 — Core Experience (High Priority)
+These fix the most noticeable gaps:
 
-## Suggested file structure
-- index.html
-- src/
-  - main.js
-  - scenes.js (or scenes.json)
-  - state.js (persistence & flag helpers)
-  - ui.js (rendering)
-- styles/
-  - base.css
-- README.md (this document)
+Dialogue box system — replace scene text blocks with attributed line-by-line dialogue arrays per speaker (speaker, text, mood)
 
-## Non-goals (for MVP)
-- No server/backend required.
-- No user accounts or remote saves.
-- No complex rule engine — just boolean flags and direct conditional branching.
-- No third-party UI libraries.
+Typewriter text effect + skip button — standard VN expectation; absence feels unfinished
 
-## Testing & validation
-- Manual playthroughs to verify navigation, flag setting, and persistence.
-- Test reload and reopening the page to ensure saved progress is restored.
-- Validate scene graph does not contain dead ends unless intentional.
+Threshold-gated choices — wire your existing affinity bars to actually show/hide choices based on requires: { flagKey, min } in scene data
 
-## Metrics / Success criteria
-- A tester can start the chapter and finish it without errors.
-- Save/load functions reliably across browser sessions.
-- Story structure and flags are easy to author/modify.
+Affinity bar visual polish — label bars as character names with distinct colors (e.g., cold blue for Mitsuhide, warm gold for Nohime), not raw flag keys
 
-## Next steps
-1. Draft 10–15 scene content and small scene graph.
-2. Implement core renderer, flag logic, and persistence.
-3. Apply minimal CSS and test on desktop/mobile.
-4. Iterate on UX and edge cases (invalid scene ids, corrupted saves).
+🎮 v1.5 — Replayability & Depth
+These turn a story into a game:
+
+Ending gallery — locked grid showing discovered vs. undiscovered endings; the single strongest "one more run" driver
+
+Hidden scenes — rare dialogue that only triggers on specific flag combinations; players share discoveries naturally
+
+"What changed?" echo lines — when a past flag affects the current scene, show a subtle callback line (e.g., "Mitsuhide remembers you shielded him at Kanegasaki")
+
+Chapter replay with flag carry — restart a chapter while retaining specific knowledge flags so replays feel like dramatic irony
+
+🌸 v2.0 — Immersion Layer
+These make the atmosphere feel complete:
+
+Character sprites with mood states — portraits that swap expression based on the mood key in dialogue lines
+
+Per-scene BGM crossfade — one audio key per scene definition; huge atmosphere boost for minimal code
+
+Historical footnote overlays — after key scenes (Okehazama, Honnō-ji), show a brief real-history callout panel
+
+Screen shake / flash on dramatic moments — one CSS class trigger on betrayal/battle scenes
+
+Multiple POV chapters — experience scenes from Mitsuhide, Hideyoshi, or Ieyasu's perspective
+
+💰 v2.5 — Monetization & Growth
